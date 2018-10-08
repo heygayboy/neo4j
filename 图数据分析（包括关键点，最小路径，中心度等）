@@ -1,0 +1,63 @@
+NEO4j的CQL语音查找自网站自网站http://hugh-wangp.iteye.com/blog/1849944
+项目来
+项目来源简书：
+书：
+https://www.jianshu.com/p/17230465492d
+htt
+2d
+https://www.jianshu.com/p/c82fc62fd9a5
+
+
+L
+
+
+LOAD CSV WITH HEADERS FROM "M "https://www.macalester.edu/~abeverid/data/stormofswords.csv" AS" AS row
+MERGE (src:Character {name: e: row.Source})
+M})
+MERGE (tgt:Character {name: e: row.Target})
+M})
+MERGE (src)-[r:INTERACTS]->(tgt)
+SET ET r.weight = t = toInt(nt(row.Weight)
+
+/)
+
+//预览所有的人物关系
+MATCH p=(:Character)-[:INTERACTS]-(:Character) RETURN p
+
+
+下面进行图计算和图分析
+---------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+//人物数目 107
+MATCH (c:Character) RETURN count(c)
+//统计每个角色接触的其它角色的数目的最小值、最大值、平均值、方差，×表示C可以用c
+MATCH (c:Character)-[:INTERACTS]->() WITH c, count(*) AS num RETURN min(num) AS min, max(num) AS max, avg(num) AS avg_characters, stdev(num) AS stdev
+
+-------------------------------------------------------------------------------------
+//网络的直径或者测底线或者最长最短路径：
+MATCH (a:Character), (b:Character) WHERE id(a) > id(b) MATCH p=shortestPath((a)-[:INTERACTS*]-(b)) RETURN length(p) AS len, extract(x IN nodes(p) |  | x.name) AS) AS path ORDER BY len DESC LIMIT 4
+----------------------------------------------------------------------------
+关于上程序的说明：
+ID( property-container )返回结点的ID值 id(a) > id(b)防止match到重复的AB
+nodes(path) 返回一个path的所有结点
+EXTRACT( identifier in collection : expression )对所有identifier in collection执行expression并返回
+ORDER BY len DESC LIMIT 4 降序排列 只取前四个
+----------------------------------------------------------------------------------------------
+
+//寻找Catelyn和Drogo的最短路径 某条最短路径
+MATCH (catelyn:Character {name: "Catelyn"}), (drogo:Character {name: "Drogo"}) MATCH p=shortestPath((catelyn)-[INTERACTS*]-(drogo)) RETURN p
+//全部的最短路径
+MATCH (catelyn:Character {name: "Catelyn"}), (drogo:Character {name: "Drogo"}) MATCH p=allShortestPaths((catelyn)-[INTERACTS*]-(drogo)) RETURN p
+
+----------------------------------------------------------------------------------------------
+//寻找关键节点：在网络中，如果一个节点位于其它两个节点所有的最短路径上，即称为关键节点。下面我们找出网络中所有的关键节点
+MATCH (a:Character), (b:Character) WHERE id(a) > id(b) MATCH p=allShortestPaths((a)-[:INTERACTS*]-(b)) WITH collect(p) AS paths, a, b MATCH (c:Character) WHERE all(x IN paths WHERE c IN nodes(x)) AND NOT c IN [a,b] RETURN RN a.name, b., e, b.name, c., e, c.name AS  AS PivotalNode SKIP 490 LIMIT 10
+----------------------------------------------------------------------------------------------
+关于上程序的说明：
+COLLECT( expression ) 把expression得到的结果以list的形式返回 WITH collect(p) AS paths返回了所有的最短路径列表 
+x IN paths WHERE c IN nodes(x)：x是paths的某条path， c IN nodes(x) c是nodes(x)这条path中的结点
+ALL(identifier in collection WHERE predicate) 	判断一个断言(predicate)是否满足集合(collection)里的所有元素 c in 所有的path in paths
+MATCH (a:Character), (b:Character) WHERE id(a) > id(b) MATCH p=allShortestPaths((a)-[:INTERACTS*]-(b)) WITH collect(p) AS paths, a, b MATCH (c:Character) WHERE all(x IN paths WHERE c IN nodes(x))
+-----------------------------------------------------------------------------------
+//可视化Drogo和Ramsay所有路径看关键节点查找的是否正确
+MATCH (a:Character {name: "Drogo"}), (b:Character {name: "Ramsay"}) MATCH p=allShortestPaths((a)-[:INTERACTS*]-(b)) RETURN p

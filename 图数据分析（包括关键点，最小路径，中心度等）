@@ -10,16 +10,8 @@ https://www.jianshu.com/p/c82fc62fd9a5
 
 L
 
-
-LOAD CSV WITH HEADERS FROM "M "https://www.macalester.edu/~abeverid/data/stormofswords.csv" AS" AS row
-MERGE (src:Character {name: e: row.Source})
-M})
-MERGE (tgt:Character {name: e: row.Target})
-M})
-MERGE (src)-[r:INTERACTS]->(tgt)
-SET ET r.weight = t = toInt(nt(row.Weight)
-
-/)
+//LOAD DATA
+LOAD CSV WITH HEADERS FROM "https://www.macalester.edu/~abeverid/data/stormofswords.csv" AS row MERGE (src:Character {name: row.Source}) MERGE (tgt:Character {name: row.Target}) MERGE (src)-[r:INTERACTS]->(tgt) SET r.weight = toInt(row.Weight)
 
 //预览所有的人物关系
 MATCH p=(:Character)-[:INTERACTS]-(:Character) RETURN p

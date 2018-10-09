@@ -1,0 +1,54 @@
+1、度中心性
+MATCH (c:Character)-[:INTERACTS]->() RETURN c.name AS character, count(*) AS degree ORDER BY degree DESC
+2、加权度中心性（Weighted Degree Centrality）
+MATCH (c:Character)-[r:INTERACTS]->()  RETURN c.name AS character, sum(r.weight) AS weightedDegree ORDER BY weightedDegree DESC
+3、介数中心性（Betweenness Centrality）
+介数中心性：在网络中，一个节点的介数中心性是指其它两个节点的所有最短路径都经过这个节点，则这些所有最短路径数即为此节点的介数中心性。介数中心性是一种重要的度量，因为它可以鉴别出网络中的“信息中间人”或者网络聚类后的联结点。
+MATCH (c:Character) WITH collect(c) AS characters CALL apoc.algo.betweenness(['INTERACTS'], characters, 'BOTH') YIELD node, score SET node.betweenness = score RETURN node.name AS name, score ORDER BY score DESC
+4、紧度中心性（Closeness centrality）
+紧度中心性是指到网络中所有其他角色的平均距离的倒数。在图中，具有高紧度中心性的节点在聚类社区之间被高度联结，但在社区之外不一定是高度联结的。
+MATCH (c:Character) WITH collect(c) AS characters CALL apoc.algo.closeness(['INTERACTS'], characters, 'BOTH') YIELD node, score RETURN node.name AS name, score ORDER BY score DESC
+
+
+
+
+附1：
+-------安装APOC--------
+https://blog.csdn.net/graphway/article/details/78957415
+APOC 包括文本查找和索引，图论算法，功能函数
+一、安装APOC1、下载jar包：https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases
+2、把jar包放在安装目录的plugins文件夹下
+3、在neo4j.conf文件下加上：
+#
+dbms.security.procedures.unrestricted=apoc.*#增加页缓存到至少4G，推荐20G:
+dbms.memory.pagecache.size=4g#JVM堆保存留内存从1G起，最大4G:
+dbms.memory.heap.initial_size=1g
+dbms.memory.heap.max_size=4g
+#
+4、重启Neo4j服务
+5、在可视化界面运行：return apoc.version()，如果出现对应的版本号，证明安装成功
+
+---------------------
+
+本文来自 jihaha2018 的CSDN 博客 ，全文地址请点击：https://blog.csdn.net/timefisher/article/details/79893826?utm_source=copy 
+
+附2：
+如何利用py2neo+python+networkx求最小社区：
+
+如何衡量节点的重要性：
+（节点中心的度量包括节点度中心性、接近中心性、介数中心性以及特征向量中心性）
+1、度中心性：
+度中心性（Degree Centrality）是在网络分析中刻画节点中心性（Centrality）的最直接度量指标。一个节点的节点度越大就意味着这个节点的度中心性越高，该节点在网络中就越重要。
+计算方法：
+除了度中心性，还有接近中心性（Closeness Centrality）。反映在网络中某一节点与其他节点之间的接近程度。 [8] ，中介中心性/中间中心性(Between Centrality) 。以经过某个节点的最短路径数目来刻画节点重要性的指标。 [9] ，特征向量中心性（Eigenvector Centrality）。
+一个节点的重要性既取决于其邻居节点的数量（即该节点的度），也取决于其邻居节点的重要性。
+2、接近中心性：
+如果一个节点与许多其他节点都很”接近“，那么节点处于网络中心位置（central），计算方法为某节点到其他所有节点距离之和的倒数
+3、介数中心性：
+度量试图概括的是某个节点在多大程度上“介于”（between）其他节点对之间。节点的“重要性”与其再网络路径中的位置有关。
+CB(v)=∑s≠t≠vεVσ(s,t|v)σ(s,t)
+4、特征向量中心性：
+基于节点的特征，例如“状态”、“声望”或者“排名”等，用线性代数中特征向量形式表示。
+
+二、社区发现算法
+https://www.cnblogs.com/nolonely/p/6136880.html

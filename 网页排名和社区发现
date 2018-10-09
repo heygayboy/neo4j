@@ -1,0 +1,31 @@
+python-igraph计算分析，Python-igraph移植自R的igraph图形分析库。 使用pip install python-igraph安装它
+直接Pip无法import参考文章：https://blog.csdn.net/langqingzailanda/article/details/60749025
+
+
+1、首先需要从Neo4j拉取数据，用Python建立igraph实例
+##----------------------------------------------------------------------##
+from py2neo import Graph
+from igraph import Graph as IGraph
+
+
+graph = Graph(
+	"http://localhost:7474",
+	username = "neo4j",
+	password = "651219"
+)
+
+query = ''' MATCH (c1:Character)-[r:INTERACTS]->(c2:Character) RETURN c1.name, c2.name, r.weight AS weight '''
+ig = IGraph.TupleList(graph.run(query), weights=True)
+
+现在有了igraph对象，可以运行igraph实现的各种图算法来。
+
+2、网页排名算法
+它是一种特征向量中心性(eigenvector centrality)算法
+互联网上各个网页之间的链接关系我们都可以看成是一个有向图
+一个网页的重要性由链接到该网页的其他网页来投票，一个较多链入的页面会有比较高等级，反之如果一个页面没有链入或链入较少等级则低，网页的PR值越高，代表网页越重要
+算法介绍：https://www.cnblogs.com/baoliyan/p/6380676.html
+程序见PageRank.py
+
+3、社区发现（Community detection）
+社区发现（Community Detection）算法用来发现网络中的社区结构，也可以看做是一种聚类算法。
+https://www.cnblogs.com/end/p/6364345.html

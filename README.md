@@ -3,5 +3,6 @@
 
 文件阅读顺序为：图数据分析---结点中心性----PageRank和社区发现（community detection）算法
 
-环境：Ubuntu16.04
+环境：Ubuntu16.04 + neo4j + apoc
+(安装见文档说明)
 ##
